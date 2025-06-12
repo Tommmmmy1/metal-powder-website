@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金属粉末专业供应商 - 高品质金属粉末产品</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><i class="fas fa-industry"></i> 金属粉末专家</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home" class="nav-link">首页</a></li>
+                <li class="nav-item"><a href="#products" class="nav-link">产品中心</a></li>
+                <li class="nav-item"><a href="#applications" class="nav-link">应用领域</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link">关于我们</a></li>
+                <li class="nav-item"><a href="#contact" class="nav-link">联系我们</a></li>
+                <li class="nav-item">
+                    <button class="cart-btn" onclick="toggleCart()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </button>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主页横幅 -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>专业金属粉末供应商</h1>
+            <p>提供高品质的金属粉末产品，满足您的工业需求</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="scrollToSection('products')">浏览产品</button>
+                <button class="btn btn-secondary" onclick="scrollToSection('contact')">联系咨询</button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-cogs"></i>
+        </div>
+    </section>
+
+    <!-- 产品中心 -->
+    <section id="products" class="products-section">
+        <div class="container">
+            <h2 class="section-title">产品中心</h2>
+            <div class="products-filter">
+                <button class="filter-btn active" data-category="all">全部产品</button>
+                <button class="filter-btn" data-category="铁粉">铁粉</button>
+                <button class="filter-btn" data-category="铜粉">铜粉</button>
+                <button class="filter-btn" data-category="铝粉">铝粉</button>
+                <button class="filter-btn" data-category="合金粉">合金粉</button>
+            </div>
+            <div class="products-grid" id="products-grid">
+                <!-- 产品将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 应用领域 -->
+    <section id="applications" class="applications-section">
+        <div class="container">
+            <h2 class="section-title">应用领域</h2>
+            <div class="applications-grid">
+                <div class="application-card">
+                    <div class="application-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3>汽车工业</h3>
+                    <p>用于汽车零部件制造，提供高强度和耐久性的金属粉末解决方案</p>
+                </div>
+                <div class="application-card">
+                    <div class="application-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <h3>航空航天</h3>
+                    <p>满足航空航天工业对高精度、轻量化材料的严格要求</p>
+                </div>
+                <div class="application-card">
+                    <div class="application-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3>建筑材料</h3>
+                    <p>为建筑行业提供高质量的金属粉末，用于结构件和装饰材料</p>
+                </div>
+                <div class="application-card">
+                    <div class="application-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3>电子工业</h3>
+                    <p>精细金属粉末用于电子元件制造，确保产品性能和可靠性</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>关于我们</h2>
+                    <p>我们是一家专业的金属粉末供应商，拥有多年的行业经验和先进的生产设备。我们致力于为客户提供高品质的金属粉末产品和专业的技术服务。</p>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <h3>10+</h3>
+                            <p>年行业经验</p>
+                        </div>
+                        <div class="stat">
+                            <h3>500+</h3>
+                            <p>合作客户</p>
+                        </div>
+                        <div class="stat">
+                            <h3>99%</h3>
+                            <p>客户满意度</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <i class="fas fa-certificate"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2 class="section-title">联系我们</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>地址</h3>
+                            <p>请在此处添加您的公司地址</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>电话</h3>
+                            <p>请在此处添加您的联系电话</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>邮箱</h3>
+                            <p>请在此处添加您的邮箱地址</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <input type="text" id="name" name="name" placeholder="您的姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" placeholder="您的邮箱" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="phone" name="phone" placeholder="您的电话">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" name="message" placeholder="您的留言" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">发送消息</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 购物车侧边栏 -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>购物车</h3>
+            <button class="close-cart" onclick="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- 购物车商品将通过JavaScript动态生成 -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <h3>总计: ¥<span id="cart-total">0</span></h3>
+            </div>
+            <button class="btn btn-primary checkout-btn" onclick="checkout()">结算</button>
+        </div>
+    </div>
+
+    <!-- 产品详情模态框 -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-body" id="modal-body">
+                <!-- 产品详情将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>金属粉末专家</h3>
+                    <p>专业的金属粉末供应商，为您提供高品质的产品和服务。</p>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#products">产品中心</a></li>
+                        <li><a href="#applications">应用领域</a></li>
+                        <li><a href="#about">关于我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>联系方式</h3>
+                    <p><i class="fas fa-envelope"></i> info@example.com</p>
+                    <p><i class="fas fa-phone"></i> +86 123-456-7890</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 金属粉末专家. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
