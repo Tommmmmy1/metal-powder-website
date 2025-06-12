@@ -303,11 +303,303 @@ function checkout() {
     const itemsList = cart.map(item => `${item.name} × ${item.quantity}`).join('\n');
     
     if (confirm(`确认购买以下商品吗？\n\n${itemsList}\n\n总计: ¥${total.toFixed(2)}`)) {
-        alert('订单已提交！我们会尽快与您联系确认订单详情。');
-        cart = [];
-        updateCartDisplay();
-        toggleCart();
+        // 生成订单编号
+        const orderNumber = 'MP' + Date.now().toString().slice(-8);
+        const orderDate = new Date().toLocaleString('zh-CN');
+        
+        // 创建详细订单信息
+        const orderDetails = {
+            orderNumber: orderNumber,
+            date: orderDate,
+            items: cart,
+            total: total.toFixed(2),
+            customerInfo: null // 将在收集客户信息后填充
+        };
+        
+        // 收集客户信息
+        showCustomerInfoForm(orderDetails);
     }
+}
+
+// 显示客户信息表单
+function showCustomerInfoForm(orderDetails) {
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <div class="customer-info-form">
+            <h2>订单信息确认</h2>
+            <div class="order-summary">
+                <h3>订单编号: ${orderDetails.orderNumber}</h3>
+                <p>下单时间: ${orderDetails.date}</p>
+                <div class="order-items">
+                    ${orderDetails.items.map(item => `
+                        <div class="order-item">
+                            <span>${item.name}</span>
+                            <span>${item.quantity} ${item.unit}</span>
+                            <span>¥${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="order-total">总计: ¥${orderDetails.total}</div>
+            </div>
+            
+            <h3>请填写您的联系信息：</h3>
+            <form id="customer-info-form">
+                <div class="form-group">
+                    <input type="text" id="customer-name" placeholder="您的姓名 *" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="customer-phone" placeholder="联系电话 *" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="customer-email" placeholder="邮箱地址 *" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="customer-company" placeholder="公司名称">
+                </div>
+                <div class="form-group">
+                    <textarea id="customer-address" placeholder="收货地址 *" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <textarea id="customer-notes" placeholder="备注信息（特殊要求等）" rows="2"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">确认订单</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.getElementById('product-modal').style.display = 'block';
+    
+    // 处理表单提交
+    document.getElementById('customer-info-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const customerInfo = {
+            name: document.getElementById('customer-name').value,
+            phone: document.getElementById('customer-phone').value,
+            email: document.getElementById('customer-email').value,
+            company: document.getElementById('customer-company').value,
+            address: document.getElementById('customer-address').value,
+            notes: document.getElementById('customer-notes').value
+        };
+        
+        orderDetails.customerInfo = customerInfo;
+        processOrder(orderDetails);
+    });
+}
+
+// 处理订单
+function processOrder(orderDetails) {
+    // 保存订单到本地存储
+    saveOrderToLocal(orderDetails);
+    
+    // 生成邮件内容
+    const emailContent = generateEmailContent(orderDetails);
+    
+    // 显示订单确认和邮件链接
+    showOrderConfirmation(orderDetails, emailContent);
+    
+    // 清空购物车
+    cart = [];
+    updateCartDisplay();
+    toggleCart();
+}
+
+// 保存订单到本地存储
+function saveOrderToLocal(orderDetails) {
+    let orders = JSON.parse(localStorage.getItem('metalPowderOrders') || '[]');
+    orders.push(orderDetails);
+    localStorage.setItem('metalPowderOrders', JSON.stringify(orders));
+}
+
+// 生成邮件内容
+function generateEmailContent(orderDetails) {
+    const subject = `新订单 - ${orderDetails.orderNumber}`;
+    const body = `
+订单详情：
+订单编号：${orderDetails.orderNumber}
+下单时间：${orderDetails.date}
+
+客户信息：
+姓名：${orderDetails.customerInfo.name}
+电话：${orderDetails.customerInfo.phone}
+邮箱：${orderDetails.customerInfo.email}
+公司：${orderDetails.customerInfo.company || '未填写'}
+地址：${orderDetails.customerInfo.address}
+备注：${orderDetails.customerInfo.notes || '无'}
+
+订单明细：
+${orderDetails.items.map(item => `${item.name} × ${item.quantity}${item.unit} - ¥${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+
+订单总计：¥${orderDetails.total}
+
+请及时处理此订单。
+    `;
+    
+    return { subject, body };
+}
+
+// 显示订单确认
+function showOrderConfirmation(orderDetails, emailContent) {
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <div class="order-confirmation">
+            <div class="success-icon">✅</div>
+            <h2>订单提交成功！</h2>
+            <div class="order-info">
+                <h3>订单编号：${orderDetails.orderNumber}</h3>
+                <p>感谢您的订购，我们已收到您的订单信息。</p>
+                <p>我们会在24小时内与您联系确认订单详情和付款方式。</p>
+            </div>
+            <div class="admin-actions">
+                <h4>商家操作：</h4>
+                <button class="btn btn-secondary" onclick="copyOrderInfo('${orderDetails.orderNumber}')">
+                    复制订单信息
+                </button>
+                <button class="btn btn-primary" onclick="sendOrderEmail('${encodeURIComponent(emailContent.subject)}', '${encodeURIComponent(emailContent.body)}')">
+                    发送邮件给自己
+                </button>
+                <button class="btn btn-secondary" onclick="viewAllOrders()">
+                    查看所有订单
+                </button>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 20px;">关闭</button>
+        </div>
+    `;
+}
+
+// 复制订单信息
+function copyOrderInfo(orderNumber) {
+    const orders = JSON.parse(localStorage.getItem('metalPowderOrders') || '[]');
+    const order = orders.find(o => o.orderNumber === orderNumber);
+    if (order) {
+        const orderText = `
+订单编号：${order.orderNumber}
+下单时间：${order.date}
+客户：${order.customerInfo.name}
+电话：${order.customerInfo.phone}
+邮箱：${order.customerInfo.email}
+地址：${order.customerInfo.address}
+订单明细：
+${order.items.map(item => `${item.name} × ${item.quantity}${item.unit} - ¥${(item.price * item.quantity).toFixed(2)}`).join('\n')}
+总计：¥${order.total}
+        `;
+        
+        navigator.clipboard.writeText(orderText).then(() => {
+            alert('订单信息已复制到剪贴板');
+        });
+    }
+}
+
+// 发送订单邮件
+function sendOrderEmail(subject, body) {
+    const mailtoLink = `mailto:linyif619@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+}
+
+// 查看所有订单
+function viewAllOrders() {
+    const orders = JSON.parse(localStorage.getItem('metalPowderOrders') || '[]');
+    
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <div class="orders-management">
+            <h2>订单管理</h2>
+            <div class="orders-stats">
+                <div class="stat-item">
+                    <h3>${orders.length}</h3>
+                    <p>总订单数</p>
+                </div>
+                <div class="stat-item">
+                    <h3>¥${orders.reduce((sum, order) => sum + parseFloat(order.total), 0).toFixed(2)}</h3>
+                    <p>总销售额</p>
+                </div>
+            </div>
+            <div class="orders-list">
+                ${orders.length === 0 ? '<p>暂无订单</p>' : orders.reverse().map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <strong>订单编号：${order.orderNumber}</strong>
+                            <span class="order-date">${order.date}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>客户：</strong>${order.customerInfo.name} | ${order.customerInfo.phone}</p>
+                            <p><strong>邮箱：</strong>${order.customerInfo.email}</p>
+                            <p><strong>地址：</strong>${order.customerInfo.address}</p>
+                            <div class="order-items-summary">
+                                ${order.items.map(item => `<span class="item-tag">${item.name} × ${item.quantity}</span>`).join('')}
+                            </div>
+                            <div class="order-total"><strong>总计：¥${order.total}</strong></div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-small btn-secondary" onclick="copyOrderInfo('${order.orderNumber}')">复制</button>
+                            <button class="btn btn-small btn-primary" onclick="exportOrderToEmail('${order.orderNumber}')">邮件</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="orders-actions">
+                <button class="btn btn-secondary" onclick="exportAllOrders()">导出所有订单</button>
+                <button class="btn btn-primary" onclick="closeModal()">关闭</button>
+            </div>
+        </div>
+    `;
+}
+
+// 导出单个订单到邮件
+function exportOrderToEmail(orderNumber) {
+    const orders = JSON.parse(localStorage.getItem('metalPowderOrders') || '[]');
+    const order = orders.find(o => o.orderNumber === orderNumber);
+    if (order) {
+        const emailContent = generateEmailContent(order);
+        sendOrderEmail(encodeURIComponent(emailContent.subject), encodeURIComponent(emailContent.body));
+    }
+}
+
+// 导出所有订单
+function exportAllOrders() {
+    const orders = JSON.parse(localStorage.getItem('metalPowderOrders') || '[]');
+    if (orders.length === 0) {
+        alert('暂无订单数据');
+        return;
+    }
+    
+    const csvContent = generateOrdersCSV(orders);
+    downloadCSV(csvContent, `金属粉末订单_${new Date().toISOString().split('T')[0]}.csv`);
+}
+
+// 生成CSV格式
+function generateOrdersCSV(orders) {
+    const headers = ['订单编号', '下单时间', '客户姓名', '联系电话', '邮箱', '公司', '收货地址', '商品明细', '订单总额', '备注'];
+    const rows = orders.map(order => [
+        order.orderNumber,
+        order.date,
+        order.customerInfo.name,
+        order.customerInfo.phone,
+        order.customerInfo.email,
+        order.customerInfo.company || '',
+        order.customerInfo.address,
+        order.items.map(item => `${item.name}×${item.quantity}`).join(';'),
+        order.total,
+        order.customerInfo.notes || ''
+    ]);
+    
+    return [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+}
+
+// 下载CSV文件
+function downloadCSV(content, filename) {
+    const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // 显示购物车消息
